@@ -460,6 +460,17 @@
         .search-bar::placeholder {
             color: #999;
         }
+        .new-word-badge {
+            font-size: 1.5rem;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #e74c3c;
+            border-radius: 50%;
+            padding: 4px 8px;
+            color: white;
+            font-weight: bold;
+        }
 
         /* Make inputs smaller on mobile */
         @media (max-width: 768px) {
@@ -555,7 +566,7 @@
     // 定义分类顺序 & 展示名称
     const CATEGORIES = {{ categories | safe }};
 
-    let currentCategory = 'idiom';   // 默认显示成语
+    let currentCategory = "{{word_type}}";   // 默认显示成语
 
     // 获取分类对应词汇
     function fetchWords(query, type) {
@@ -599,12 +610,18 @@
             btn.addEventListener('click', () => {
                 if (currentCategory === cat.id) return;
                 currentCategory = cat.id;
+                setTypeParam();       // 更新 URL 参数
                 renderTabs();          // 刷新激活样式
                 renderGames();         // 刷新相关游戏展示
                 renderWordGrid();       // 刷新词汇网格
             });
             tabsContainer.appendChild(btn);
         });
+    }
+    function setTypeParam() {
+        const url = new URL(window.location);
+        url.searchParams.set('type', currentCategory);
+        window.history.pushState({}, '', url);
     }
     function renderGames() {
         const container = document.getElementById('gamesContainer');
@@ -995,6 +1012,7 @@
             card.className = 'word-card';
             card.innerHTML = `
                 <div class="chinese-word">${escapeHtml(item.word)}</div>
+                ${(!item.data || Object.keys(item.data).length === 0) ? `<div class="new-word-badge">新</div>` : ''}
                 <span style="font-size:0.9rem;color:#7f8c8d;margin-top:6px;">${escapeHtml(category ? category.label : item.type)}</span>
             `;
             card.addEventListener('click', (e) => {

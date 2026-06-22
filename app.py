@@ -54,7 +54,8 @@ categories = [
 
 @app.route('/')
 def index():
-    return render_template('word-list.html', categories=categories)
+    word_type = request.args.get('type', 'all')
+    return render_template('word-list.html', categories=categories, word_type=word_type)
 
 @app.route('/import-list-raw', methods=['POST'])
 def import_word_list_raw():
