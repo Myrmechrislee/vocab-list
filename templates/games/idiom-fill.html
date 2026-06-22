@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>成语填空 · 趣味学汉语</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #fef9e6 0%, #fff3e0 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #c93a3a, #f4b942);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+        .hero p {
+            color: #a55d35;
+            margin-top: 0.5rem;
+            background: #fff0dd;
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+        }
+        .game-panel {
+            background: rgba(255, 250, 240, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255, 215, 170, 0.5);
+            margin-bottom: 2rem;
+        }
+        .question-area {
+            text-align: center;
+            padding: 1rem 0 0.5rem 0;
+        }
+        .idiom-display {
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #c0392b;
+            background: #fff6ea;
+            padding: 0.8rem 1.2rem;
+            border-radius: 60px;
+            display: inline-block;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+            margin: 0.5rem 0 0.2rem 0;
+            font-family: 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .blank-highlight {
+            display: inline-block;
+            min-width: 2.8rem;
+            border-bottom: 4px solid #e67e22;
+            color: #e67e22;
+            background: #ffeedd;
+            border-radius: 8px 8px 0 0;
+            padding: 0 0.1rem;
+        }
+        .hint-area {
+            font-size: 1.1rem;
+            color: #7a4a2a;
+            margin: 0.8rem 0 1.2rem 0;
+            font-weight: 500;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 1.5rem 0;
+        }
+        .input-group input {
+            font-size: 1.6rem;
+            padding: 0.4rem 1rem;
+            width: 160px;
+            text-align: center;
+            border: 2px solid #f5bc70;
+            border-radius: 40px;
+            background: white;
+            outline: none;
+            transition: 0.2s;
+            font-weight: 600;
+            color: #2c3e2f;
+        }
+        .input-group input:focus {
+            border-color: #e67e22;
+            box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.15);
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .btn {
+            background: #fff4e8;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 60px;
+            color: #b45f2b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+            backdrop-filter: blur(2px);
+            letter-spacing: 1px;
+        }
+        .btn-primary {
+            background: #e67e22;
+            color: white;
+            box-shadow: 0 8px 18px rgba(230, 126, 34, 0.25);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: #cf711a;
+        }
+        .btn-secondary {
+            background: #fff0dd;
+            color: #a55d35;
+        }
+        .btn-secondary:hover {
+            background: #ffdbb5;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #f5bc70;
+            color: #b45f2b;
+        }
+        .btn-outline:hover {
+            background: #fff0dd;
+        }
+        .result-area {
+            margin-top: 1.2rem;
+            padding: 1rem;
+            border-radius: 40px;
+            background: #fff9f0;
+            min-height: 4rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px 20px;
+        }
+        .result-message {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e2f;
+        }
+        .result-message.correct {
+            color: #27ae60;
+        }
+        .result-message.wrong {
+            color: #e74c3c;
+        }
+        .score-badge {
+            background: #fae8d4;
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            font-weight: 600;
+            color: #b45f2b;
+        }
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+            padding: 0 0.5rem;
+        }
+        .progress-text {
+            color: #7a4a2a;
+            font-weight: 500;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            color: #cea776;
+            font-size: 0.8rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: #b45f2b;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .back-link:hover {
+            border-bottom-color: #b45f2b;
+        }
+        @media (max-width: 550px) {
+            .hero h1 { font-size: 2rem; }
+            .idiom-display { font-size: 2.4rem; letter-spacing: 4px; }
+            .input-group input { width: 130px; font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="hero">
+        <h1>🧩 成语填空 · 趣玩</h1>
+        <p>✨ 根据拼音或释义，补全成语中的空缺 ✨</p>
+    </div>
+
+    <div class="game-panel">
+        <div class="question-area">
+            <!-- 成语展示区 (挖空) -->
+            <div class="idiom-display" id="idiomDisplay">— — — —</div>
+            <div class="hint-area" id="hintText">点击「下一题」开始挑战</div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="answerInput" placeholder="输入汉字" autocomplete="off">
+            <button class="btn btn-primary" id="submitBtn">✔ 提交</button>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary" id="nextBtn">⏩ 下一题</button>
+            <button class="btn btn-outline" id="revealBtn">💡 提示</button>
+            <button class="btn btn-outline" id="resetBtn">🔄 重来</button>
+        </div>
+
+        <div class="result-area" id="resultArea">
+            <span class="result-message" id="resultMessage">✨ 加油，你能行！</span>
+            <span class="score-badge" id="scoreBadge">🏆 0 / 0</span>
+        </div>
+
+        <div class="progress-row">
+            <span class="progress-text" id="progressText">第 0 / 0 题</span>
+            <span class="progress-text" id="statusHint">状态：等待开始</span>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <a href="/" class="back-link">⬅ 返回词汇宝典</a>
+    </div>
+    <div class="footer">🌸 成语填空 · 在语境中掌握汉语之美</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 游戏状态 ----------
+        const state = {
+            // 所有成语列表，由后端注入
+            idioms: [],
+            // 当前题目索引
+            currentIndex: 0,
+            // 当前展示的成语对象 { word, pinyin, explanation, blankIndex }
+            currentItem: null,
+            // 得分
+            score: 0,
+            // 已答数量
+            attempted: 0,
+            // 是否已经回答当前题目
+            answered: false,
+        };
+
+        // DOM 元素
+        const idiomDisplay = document.getElementById('idiomDisplay');
+        const hintText = document.getElementById('hintText');
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const revealBtn = document.getElementById('revealBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultMessage = document.getElementById('resultMessage');
+        const scoreBadge = document.getElementById('scoreBadge');
+        const progressText = document.getElementById('progressText');
+        const statusHint = document.getElementById('statusHint');
+
+        // ---------- 辅助函数 ----------
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        function getRandomIntInclusive(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        // 渲染成语显示 (挖空)
+        function renderIdiom(item) {
+            if (!item) {
+                idiomDisplay.textContent = '— — — —';
+                return;
+            }
+            const chars = item.word.split('');
+            const blankCount = getRandomIntInclusive(1, Math.floor(chars.length / 3 * 2));
+            const blankIdxs = [];
+
+            document.querySelector('#answerInput').maxLength = blankCount;
+
+            while (blankIdxs.length < blankCount) {
+                const idx = getRandomIntInclusive(0, chars.length - 1);
+                if (!blankIdxs.includes(idx)) {
+                    blankIdxs.push(idx);
+                }
+            }
+            state.currentItem.answer = '';
+            let displayStr = '';
+            for (let i = 0; i < chars.length; i++) {
+                if (blankIdxs.includes(i)) {
+                    displayStr += `<span class="blank-highlight"> </span>`;
+                    state.currentItem.answer += chars[i];
+                } else {
+                    displayStr += chars[i];
+                }
+                if (i < chars.length - 1) displayStr += ' ';
+            }
+            idiomDisplay.innerHTML = displayStr;
+        }
+
+        // 更新提示 (显示拼音 + 释义)
+        function updateHint(item) {
+            if (!item) {
+                hintText.textContent = '点击「下一题」开始挑战';
+                return;
+            }
+            hintText.hidden = true;
+            let hint = '';
+            if (item.pinyin) {
+                hint += `拼音：${item.pinyin}`;
+            }
+            if (item.data) {
+                if (item.data.explanation) {
+                    hint += hint ? '  ·  ' : '';
+                    hint += `释义：${item.data.explanation}`;
+                }
+            }
+            hintText.textContent = hint || '✨ 试试看！';
+        }
+
+        // 更新得分/进度显示
+        function updateStats() {
+            const total = state.idioms.length;
+            const cur = state.currentIndex + 1;
+            progressText.textContent = `第 ${cur} / ${total} 题`;
+            scoreBadge.textContent = `🏆 ${state.score} / ${state.attempted}`;
+            if (state.answered) {
+                statusHint.textContent = '✅ 已作答';
+            } else {
+                statusHint.textContent = '⏳ 待作答';
+            }
+        }
+
+        // 加载题目 (根据 currentIndex)
+        function loadQuestion() {
+            const total = state.idioms.length;
+            if (total === 0) {
+                idiomDisplay.textContent = '🎯 暂无成语数据';
+                hintText.textContent = '请刷新页面或稍后再试';
+                return;
+            }
+            // 如果 currentIndex 超出范围，重置到 0
+            if (state.currentIndex >= total) {
+                state.currentIndex = 0;
+            }
+            const item = state.idioms[state.currentIndex];
+            state.currentItem = item;
+            state.answered = false;
+            renderIdiom(item);
+            updateHint(item);
+            answerInput.value = '';
+            answerInput.disabled = false;
+            answerInput.focus();
+            resultMessage.textContent = '✍️ 输入你的答案';
+            resultMessage.className = 'result-message';
+            // 更新进度
+            updateStats();
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            if (!state.currentItem) {
+                resultMessage.textContent = '⚠️ 请先加载题目';
+                return;
+            }
+            if (state.answered) {
+                resultMessage.textContent = '⏳ 本题已答，点击「下一题」继续';
+                return;
+            }
+            const userAnswer = answerInput.value.trim();
+            if (!userAnswer) {
+                resultMessage.textContent = '📝 请输入一个汉字';
+                return;
+            }
+
+            const correctChars = state.currentItem.answer;
+
+            state.attempted += 1;
+
+            if (userAnswer === correctChars) {
+                state.score += 1;
+                resultMessage.textContent = '🎉 完全正确！太棒啦！';
+                resultMessage.className = 'result-message correct';
+                // 填上正确的字 (视觉反馈)
+                const chars = state.currentItem.word.split('');
+                let displayStr = '';
+                for (let i = 0; i < chars.length; i++) {
+                    if (i === state.currentItem.blankIndex) {
+                        displayStr += `<span style="color:#27ae60;font-weight:bold;">${chars[i]}</span>`;
+                    } else {
+                        displayStr += chars[i];
+                    }
+                    if (i < chars.length - 1) displayStr += ' ';
+                }
+                idiomDisplay.innerHTML = displayStr;
+            } else {
+                resultMessage.textContent = `❌ 再想想…… 正确答案是 “${state.currentItem.word}”`;
+                resultMessage.className = 'result-message wrong';
+            }
+
+            state.answered = true;
+            answerInput.disabled = true;
+            updateStats();
+        }
+
+        // 下一题
+        function nextQuestion() {
+            const total = state.idioms.length;
+            if (total === 0) return;
+            // 循环到下一题
+            state.currentIndex = (state.currentIndex + 1) % total;
+            loadQuestion();
+            // 清空结果样式
+            resultMessage.className = 'result-message';
+        }
+
+        // 重置游戏 (重新洗牌，分数归零)
+        function resetGame() {
+            // 重新洗牌
+            state.idioms = shuffleArray(state.idioms.slice());
+            state.currentIndex = 0;
+            state.score = 0;
+            state.attempted = 0;
+            loadQuestion();
+            resultMessage.textContent = '🔄 已重置，加油！';
+            resultMessage.className = 'result-message';
+        }
+
+        // 提示 (reveal) —— 显示正确字但不计入得分
+        function revealHint() {
+            hintText.hidden = false;
+        }
+
+        // ---------- 从后端获取成语数据 ----------
+        function fetchIdioms() {
+            fetch('/api/words?type=idiom')
+                .then(response => {
+                    if (!response.ok) throw new Error('网络请求失败');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && Array.isArray(data.words) && data.words.length > 0) {
+                        // 洗牌
+                        state.idioms = shuffleArray(data.words);
+                        // 初始化第一题
+                        loadQuestion();
+                    } else {
+                        // 无数据，显示占位
+                        state.idioms = [];
+                        idiomDisplay.textContent = '📭 暂无成语数据';
+                        hintText.textContent = '请确保后端提供了成语数据';
+                    }
+                })
+                .catch(err => {
+                    console.error('获取成语失败:', err);
+                    idiomDisplay.textContent = '⚠️ 加载失败';
+                    hintText.textContent = '请检查网络或后端服务';
+                });
+        }
+
+        // ---------- 事件绑定 ----------
+        function initEvents() {
+            submitBtn.addEventListener('click', checkAnswer);
+            nextBtn.addEventListener('click', nextQuestion);
+            resetBtn.addEventListener('click', resetGame);
+            revealBtn.addEventListener('click', revealHint);
+
+            // 回车键提交
+            answerInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            // 输入时自动清空结果状态 (若未作答)
+            answerInput.addEventListener('input', () => {
+                if (!state.answered) {
+                    resultMessage.textContent = '✍️ 输入中……';
+                    resultMessage.className = 'result-message';
+                }
+            });
+        }
+
+        // ---------- 启动 ----------
+        function init() {
+            initEvents();
+            // 先显示占位，再请求数据
+            idiomDisplay.textContent = '⏳ 加载成语库……';
+            fetchIdioms();
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>

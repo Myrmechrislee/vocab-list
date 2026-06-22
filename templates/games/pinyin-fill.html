@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>拼音默写 · 选字成词</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f7ff 0%, #e6f0fa 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #1f5e8e, #3a9bd5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+        .hero p {
+            color: #1f4b6e;
+            margin-top: 0.3rem;
+            background: #d4e7f7;
+            display: inline-block;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .game-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(6px);
+            border-radius: 48px;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 15px 30px rgba(0, 20, 40, 0.08);
+            border: 1px solid rgba(80, 150, 210, 0.25);
+            margin-bottom: 2rem;
+        }
+        .question-area {
+            text-align: center;
+            padding: 0.8rem 0 0.2rem;
+        }
+        .pinyin-display {
+            font-size: 3.4rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #0b3b5c;
+            background: #e1eff9;
+            padding: 0.8rem 1.8rem;
+            border-radius: 80px;
+            display: inline-block;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+            margin: 0.5rem 0 0.2rem;
+            font-family: 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .pinyin-tone {
+            color: #c44536;
+            font-weight: 400;
+            margin-left: 6px;
+        }
+        .word-length-hint {
+            font-size: 1.1rem;
+            color: #2a5f7a;
+            margin-top: 0.2rem;
+            font-weight: 500;
+            background: #dbeaf5;
+            display: inline-block;
+            padding: 0.2rem 1.4rem;
+            border-radius: 30px;
+        }
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin: 1.8rem 0 1rem;
+        }
+        .option-btn {
+            background: white;
+            border: 2px solid #b6d4e8;
+            padding: 0.6rem 1.6rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            border-radius: 60px;
+            color: #1a3b4f;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.02);
+            min-width: 80px;
+            letter-spacing: 2px;
+            background: #fafdff;
+        }
+        .option-btn:hover:not(:disabled) {
+            background: #dcebf7;
+            border-color: #4f96c9;
+            transform: translateY(-2px);
+        }
+        .option-btn.selected-correct {
+            background: #b8e0b8;
+            border-color: #2a7a3a;
+            color: #144d1a;
+        }
+        .option-btn.selected-wrong {
+            background: #f8d0d0;
+            border-color: #b34a4a;
+            color: #6f2a2a;
+        }
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 1.2rem 0 0.5rem;
+        }
+        .btn {
+            background: #f0f7fe;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-radius: 60px;
+            color: #1f5e7a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+            letter-spacing: 1px;
+        }
+        .btn-primary {
+            background: #2c7eb6;
+            color: white;
+            box-shadow: 0 8px 18px rgba(44, 126, 182, 0.25);
+        }
+        .btn-primary:hover {
+            background: #1f66a0;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #e3eff9;
+            color: #1f5e7a;
+        }
+        .btn-secondary:hover {
+            background: #c7dff0;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #b6d4e8;
+            color: #1f5e7a;
+        }
+        .btn-outline:hover {
+            background: #dcebf7;
+        }
+        .result-area {
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.2rem;
+            border-radius: 40px;
+            background: #eef6fc;
+            min-height: 4.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px 24px;
+        }
+        .result-message {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f3b4a;
+        }
+        .result-message.correct {
+            color: #1e7e34;
+        }
+        .result-message.wrong {
+            color: #b13e3e;
+        }
+        .score-badge {
+            background: #d4e3f0;
+            border-radius: 40px;
+            padding: 0.3rem 1.3rem;
+            font-weight: 600;
+            color: #1a4a66;
+        }
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+            padding: 0 0.3rem;
+        }
+        .progress-text {
+            color: #2a5f7a;
+            font-weight: 500;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            color: #7fa3be;
+            font-size: 0.8rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: #1f5e7a;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .back-link:hover {
+            border-bottom-color: #1f5e7a;
+        }
+        @media (max-width: 550px) {
+            .hero h1 { font-size: 2rem; }
+            .pinyin-display { font-size: 2.6rem; letter-spacing: 2px; padding: 0.5rem 1.2rem; }
+            .option-btn { font-size: 1.5rem; min-width: 70px; padding: 0.5rem 1rem; }
+            .btn { font-size: 1rem; padding: 0.5rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="hero">
+        <h1>🔊 拼音默写 · 选字</h1>
+        <p>🎯 听音辨字，选出正确的汉字组合</p>
+    </div>
+
+    <div class="game-panel">
+        <div class="question-area">
+            <div class="pinyin-display" id="pinyinDisplay">— · —</div>
+            <div class="word-length-hint" id="wordLengthHint">🔤 个字</div>
+        </div>
+        <div class="definition-area" id="definitionArea" style="text-align: center; margin-bottom: 1rem; min-height: 2.4rem;">
+            <!-- 词义将在这里显示 -->
+        </div>
+        <!-- 选项区：动态渲染 -->
+        <div class="options-grid" id="optionsGrid"></div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" id="submitBtn">✔ 确认选择</button>
+            <button class="btn btn-secondary" id="nextBtn">⏩ 下一题</button>
+            <button class="btn btn-outline" id="resetBtn">🔄 重来</button>
+            <!-- Show definition button -->
+            <button class="btn btn-outline" id="showDefBtn">📖 词义</button>
+        </div>
+
+        <div class="result-area" id="resultArea">
+            <span class="result-message" id="resultMessage">✨ 选出正确的字</span>
+            <span class="score-badge" id="scoreBadge">🏆 0 / 0</span>
+        </div>
+
+        <div class="progress-row">
+            <span class="progress-text" id="progressText">第 0 / 0 题</span>
+            <span class="progress-text" id="statusHint">状态：待作答</span>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <a href="/" class="back-link">⬅ 返回词汇宝典</a>
+    </div>
+    <div class="footer">🌸 拼音默写 · 在辨析中巩固汉字</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 游戏状态 ----------
+        const state = {
+            // 词库 [{ word, pinyin, chars }]
+            words: [],
+            // 当前题目索引
+            currentIndex: 0,
+            // 当前词条
+            currentItem: null,
+            // 当前生成的选项列表 (字符数组)
+            currentOptions: [],
+            // 用户选中的索引 (多个)
+            selectedIndices: [],
+            // 得分
+            score: 0,
+            // 已答数量
+            attempted: 0,
+            // 是否已作答
+            answered: false,
+        };
+
+        // DOM 元素
+        const pinyinDisplay = document.getElementById('pinyinDisplay');
+        const wordLengthHint = document.getElementById('wordLengthHint');
+        const optionsGrid = document.getElementById('optionsGrid');
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultMessage = document.getElementById('resultMessage');
+        const scoreBadge = document.getElementById('scoreBadge');
+        const progressText = document.getElementById('progressText');
+        const statusHint = document.getElementById('statusHint');
+        const showDefBtn = document.getElementById('showDefBtn');
+        const definitionArea = document.getElementById('definitionArea');
+
+        // ---------- 辅助函数 ----------
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // 从词库中提取所有字符，用于生成干扰项
+        function getAllCharsFromWords(words) {
+            const set = new Set();
+            words.forEach(w => {
+                w.chars.forEach(c => {
+                    if (/^[\u4e00-\u9fff]$/.test(c)) {
+                        set.add(c);
+                    }
+                });
+            });
+            return Array.from(set);
+        }
+
+        // 生成选项 (正确字符 + 干扰项)
+        async function generateOptions(correctChars, allChars, count = 6) {
+            // 去重，保留正确字符
+            const correctSet = new Set(correctChars);
+            // 从 allChars 中抽取干扰项 (排除正确字符)
+            const pool = allChars.filter(c => !correctSet.has(c));
+            const shuffledPool = shuffleArray(pool.slice());
+            // 取需要的干扰项数量，保证总选项数 = count (至少 >= correctChars.length)
+            const needDistractors = Math.max(count - correctChars.length, 0);
+            const distractors = shuffledPool.slice(0, needDistractors);
+            // 合并正确字符 + 干扰项，并打乱
+            let options = [...correctChars, ...distractors];
+            // 如果选项不够，从正确字符中补充 (但一般不会)
+            while (options.length < count) {
+                options.push(correctChars[0]); 
+            }
+            return shuffleArray(options);
+        }
+
+        // 更新界面：显示拼音、长度、选项按钮
+        async function renderQuestion(item) {
+            if (!item) {
+                pinyinDisplay.textContent = '— · —';
+                wordLengthHint.textContent = '🔤 加载中';
+                optionsGrid.innerHTML = '';
+                return;
+            }
+            // 显示拼音 (带声调符号)
+            pinyinDisplay.textContent = item.pinyin;
+            wordLengthHint.textContent = `🔤 ${item.chars.length} 个字`;
+
+            // 生成选项 (基于全部字符库)
+            const allChars = getAllCharsFromWords(state.words);
+            const similarChars = await fetchSimilarChars(item.chars.join(''));
+            const options = await generateOptions(item.chars, allChars.concat(similarChars), 8);
+            state.currentOptions = options;
+            state.selectedIndices = [];
+
+            // 渲染选项按钮
+            optionsGrid.innerHTML = '';
+            options.forEach((char, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = char;
+                btn.dataset.index = idx;
+                btn.addEventListener('click', () => toggleOption(idx));
+                optionsGrid.appendChild(btn);
+            });
+
+            // 重置选中样式
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected-correct', 'selected-wrong');
+                btn.disabled = false;
+            });
+
+            // 清除结果状态
+            resultMessage.textContent = '✍️ 点击汉字选择 (可多选)';
+            resultMessage.className = 'result-message';
+            state.answered = false;
+            statusHint.textContent = '⏳ 待作答';
+            submitBtn.disabled = false;
+            updateStats();
+        }
+
+        // 切换选项选中状态 (多选)
+        function toggleOption(index) {
+            if (state.answered) {
+                resultMessage.textContent = '⏳ 本题已答，点击「下一题」继续';
+                return;
+            }
+            const btn = document.querySelector(`.option-btn[data-index="${index}"]`);
+            if (!btn) return;
+            const idx = state.selectedIndices.indexOf(index);
+            if (idx > -1) {
+                state.selectedIndices.splice(idx, 1);
+                btn.classList.remove('selected-correct'); // 仅用于视觉
+            } else {
+                state.selectedIndices.push(index);
+                btn.classList.add('selected-correct');
+            }
+            // 更新提示
+            if (state.selectedIndices.length > 0) {
+                resultMessage.textContent = `已选 ${state.selectedIndices.length} 个字`;
+            } else {
+                resultMessage.textContent = '✍️ 点击汉字选择';
+            }
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            if (!state.currentItem) {
+                resultMessage.textContent = '⚠️ 请先加载题目';
+                return;
+            }
+            if (state.answered) {
+                resultMessage.textContent = '⏳ 本题已答，点击「下一题」继续';
+                return;
+            }
+            if (state.selectedIndices.length === 0) {
+                resultMessage.textContent = '📝 请至少选择一个字';
+                return;
+            }
+
+            const selectedChars = state.selectedIndices.map(idx => state.currentOptions[idx]);
+            const correctChars = state.currentItem.chars;
+            const isCorrect = selectedChars.length === correctChars.length && 
+                              selectedChars.every((c, i) => c === correctChars[i]);
+
+            state.attempted += 1;
+            if (isCorrect) {
+                state.score += 1;
+                resultMessage.textContent = '🎉 完全正确！太棒啦！';
+                resultMessage.className = 'result-message correct';
+            } else {
+                resultMessage.textContent = `❌ 正确组合是 “${correctChars.join('')}”`;
+                resultMessage.className = 'result-message wrong';
+            }
+
+            state.answered = true;
+            submitBtn.disabled = true;
+            statusHint.textContent = '✅ 已作答';
+
+            // 高亮显示正确/错误选项
+            document.querySelectorAll('.option-btn').forEach((btn, idx) => {
+                btn.disabled = true;
+                const char = btn.textContent;
+                if (correctChars.includes(char) && state.selectedIndices.includes(idx)) {
+                    btn.classList.add('selected-correct');
+                } else if (state.selectedIndices.includes(idx) && !correctChars.includes(char)) {
+                    btn.classList.add('selected-wrong');
+                } else if (correctChars.includes(char)) {
+                    btn.classList.add('selected-correct');
+                }
+            });
+
+            updateStats();
+        }
+
+        // 下一题
+        function nextQuestion() {
+            const total = state.words.length;
+            if (total === 0) return;
+            state.currentIndex = (state.currentIndex + 1) % total;
+            const item = state.words[state.currentIndex];
+            state.currentItem = item;
+            renderQuestion(item);
+            submitBtn.disabled = false;
+            // 清除所有选项的高亮
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected-correct', 'selected-wrong');
+                btn.disabled = false;
+            });
+            hideDefinition();
+            resultMessage.className = 'result-message';
+        }
+
+        // 重置
+        function resetGame() {
+            state.words = shuffleArray(state.words.slice());
+            state.currentIndex = 0;
+            state.score = 0;
+            state.attempted = 0;
+            state.currentItem = state.words[0] || null;
+            renderQuestion(state.currentItem);
+            submitBtn.disabled = false;
+            resultMessage.textContent = '🔄 已重置，加油！';
+            resultMessage.className = 'result-message';
+        }
+
+        // 更新得分与进度
+        function updateStats() {
+            const total = state.words.length;
+            const cur = state.currentIndex + 1;
+            progressText.textContent = `第 ${cur} / ${total} 题`;
+            scoreBadge.textContent = `🏆 ${state.score} / ${state.attempted}`;
+        }
+
+        // ---------- 从后端获取数据 ----------
+        function fetchWords() {
+            state.words = shuffleArray({{ words | tojson }});
+            
+            state.words.forEach((w, i) => {
+                // 确保每个词条都有 chars 数组
+                if (!w.chars || !Array.isArray(w.chars)) {
+                    w.chars = Array.from(w.word);
+                }
+            })
+
+            state.currentItem = state.words[0] || null;
+
+            renderQuestion(state.currentItem);
+        }
+
+        function fetchSimilarChars(word) {
+            return fetch(`/api/similar-chars?word=${encodeURIComponent(word)}`)
+                .then(res => res.json())
+                .then(data => data.similar_chars || [])
+                .catch(err => {
+                    console.error('获取相似字符失败:', err);
+                    return [];
+                });
+        }
+        function showDefinition() {
+            if (!state.currentItem) return;
+            const def = state.currentItem.data.explanation || '暂无词义信息';
+            definitionArea.textContent = `📖 词义：${def}`;
+        }
+        function hideDefinition() {
+            definitionArea.textContent = '';
+        }
+
+        // ---------- 事件绑定 ----------
+        function initEvents() {
+            submitBtn.addEventListener('click', submitAnswer);
+            nextBtn.addEventListener('click', nextQuestion);
+            resetBtn.addEventListener('click', resetGame);
+            showDefBtn.addEventListener('click', showDefinition);
+        }
+
+        // ---------- 启动 ----------
+        function init() {
+            initEvents();
+            pinyinDisplay.textContent = '⏳ 加载词库……';
+            fetchWords();
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>

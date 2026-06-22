@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic form · word_data (editable keys)</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+            margin: 0;
+        }
+        .card {
+            max-width: 860px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            padding: 2rem 2rem 2.5rem;
+            transition: 0.2s;
+        }
+        h1 {
+            font-weight: 500;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+            color: #0b1e33;
+            margin: 0 0 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead {
+            color: #4b5b6e;
+            margin-bottom: 2rem;
+            border-left: 4px solid #a0c0e0;
+            padding-left: 1rem;
+            font-size: 0.95rem;
+            background: #f1f5f9;
+            border-radius: 0 12px 12px 0;
+            padding: 0.7rem 1.2rem;
+        }
+        .subhead i {
+            margin-right: 8px;
+            color: #3b7cbf;
+        }
+        .field-group {
+            background: #ffffff;
+            border: 1px solid #e9edf2;
+            border-radius: 20px;
+            padding: 1.25rem 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: 0.15s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .field-group:hover {
+            border-color: #cdd9e6;
+        }
+        .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #dfe6ef;
+            padding-bottom: 0.5rem;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .key-editor {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1 1 160px;
+            min-width: 120px;
+        }
+        .key-editor i {
+            color: #3d7eb3;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .key-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1e2f41;
+            padding: 0.1rem 0.3rem;
+            min-width: 80px;
+            transition: 0.15s;
+            border-radius: 0;
+            font-family: inherit;
+        }
+        .key-input:hover {
+            border-bottom-color: #c0d2e4;
+        }
+        .key-input:focus {
+            outline: none;
+            border-bottom-color: #2b6c9e;
+            background: #f2f8ff;
+            border-radius: 4px 4px 0 0;
+        }
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #a3b8cc;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 6px;
+            transition: 0.15s;
+            border-radius: 30px;
+            flex-shrink: 0;
+        }
+        .remove-btn:hover {
+            color: #c42e2e;
+            background: #fee9e9;
+        }
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 1.2rem;
+        }
+        .input-wrapper {
+            flex: 1 1 180px;
+            min-width: 140px;
+        }
+        .input-wrapper label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #5b6f84;
+            margin-bottom: 0.2rem;
+            font-weight: 500;
+        }
+        .no-outline-input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid transparent;
+            border-bottom: 2px solid #d7e0e9;
+            background: #fafcff;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.95rem;
+            transition: 0.15s;
+            color: #0b1e33;
+        }
+        .no-outline-input:focus {
+            outline: none;
+            border-bottom-color: #2b6c9e;
+            background: #f2f8ff;
+            border-radius: 8px 8px 0 0;
+        }
+        .no-outline-input::placeholder {
+            color: #b2c4d6;
+            font-weight: 300;
+            font-size: 0.9rem;
+        }
+        .object-hint {
+            font-size: 0.7rem;
+            color: #7b8fa3;
+            margin-top: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .object-hint i {
+            font-size: 0.6rem;
+        }
+        .actions-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0 1rem;
+            gap: 0.8rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #eef3f9;
+            border: none;
+            padding: 0.6rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #1f3b57;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background: #1b3b5c;
+            color: white;
+            box-shadow: 0 4px 8px rgba(22, 55, 92, 0.12);
+        }
+        .btn-primary:hover {
+            background: #143049;
+            transform: scale(0.98);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cad5e2;
+        }
+        .btn-outline:hover {
+            background: #eaf1fa;
+            border-color: #9db4cc;
+        }
+        .btn-danger-outline {
+            background: transparent;
+            border: 1px solid #f0d8d8;
+            color: #a14242;
+        }
+        .btn-danger-outline:hover {
+            background: #fdeded;
+            border-color: #dba8a8;
+        }
+        .footer-info {
+            margin-top: 1.8rem;
+            font-size: 0.8rem;
+            color: #7d8fa2;
+            text-align: center;
+            border-top: 1px solid #e2eaf2;
+            padding-top: 1.2rem;
+        }
+        .footer-info i {
+            margin: 0 6px;
+        }
+        .badge-list {
+            background: #e9f0f7;
+            border-radius: 40px;
+            padding: 0.1rem 0.8rem;
+            font-size: 0.7rem;
+            color: #1f405e;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3rem 0.8rem;
+        }
+        .text-muted {
+            color: #6b7f93;
+        }
+        .placeholder-message {
+            padding: 1.5rem;
+            text-align: center;
+            color: #7b8fa3;
+            background: #f4f8fd;
+            border-radius: 40px;
+        }
+        /* static main fields */
+        .main-field-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 1.5rem;
+            margin-bottom: 1.8rem;
+            background: #f9fcff;
+            padding: 1rem 1.5rem;
+            border-radius: 24px;
+            border: 1px solid #e3ebf3;
+        }
+        .main-field-group .input-wrapper {
+            flex: 1 1 140px;
+        }
+        .main-field-group .no-outline-input {
+            background: white;
+        }
+        h3 {
+            font-weight: 500;
+            font-size: 1.2rem;
+            color: #1b3b5c;
+            margin: 1.2rem 0 0.8rem 0;
+            border-left: 4px solid #a0c0e0;
+            padding-left: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="app">
+    <h1>
+        <i class="fas fa-pen-fancy" style="color: #2b6c9e;"></i> 
+        <span id="wordTitle">编辑</span>
+    </h1>
+    <!-- Return button -->
+    <div class="return-button">
+        <a href="/" style="text-decoration: none; color: #4b6a8a; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px; position: absolute; top: 1.5rem; right: 2rem;">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+    <div class="subhead">
+        <i class="fas fa-info-circle"></i> 
+        每个键现在是可编辑的输入框（无边框）。值可以是文本、逗号分隔列表或对象 {text, book}。
+    </div>
+
+    <form id="dynamicForm" method="POST" action="#">
+        <h3>主要信息</h3>
+        <div class="main-field-group">
+            <div class="input-wrapper">
+                <label>Word</label>
+                <input type="text" class="no-outline-input" name="word" id="wordInput" readonly>
+            </div>
+            <div class="input-wrapper">
+                <label>Pinyin</label>
+                <input type="text" class="no-outline-input" name="pinyin" id="pinyinInput">
+            </div>
+            <div class="input-wrapper">
+                <label>Notes</label>
+                <input type="text" class="no-outline-input" name="notes" id="notesInput">
+            </div>
+        </div>
+
+        <h3>辅助信息 <span style="font-weight:400; font-size:0.8rem; color:#4b6a8a;">(键名可点击编辑)</span></h3>
+        <div id="fieldsContainer">
+            <!-- Fields rendered by JavaScript -->
+        </div>
+
+        <div class="actions-bar">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button type="button" class="btn btn-outline" id="addValueFieldBtn">
+                    <i class="fas fa-plus-circle"></i> 值
+                </button>
+                <button type="button" class="btn btn-outline" id="addListFieldBtn">
+                    <i class="fas fa-plus-circle"></i> 列表
+                </button>
+                <button type="button" class="btn btn-outline" id="addObjectFieldBtn">
+                    <i class="fas fa-plus-circle"></i> 对象
+                </button>
+            </div>
+            <button type="button" class="btn btn-danger-outline" id="resetToSampleBtn">
+                <i class="fas fa-undo-alt"></i> 重置示例
+            </button>
+            <button type="button" class="btn btn-outline" id="generateWithAIButton">
+                <i class="fas fa-robot"></i> 使用AI生成
+            </button>
+            <button type="button" class="btn btn-outline" id="deleteWordButton">
+                <i class="fas fa-trash"></i> 删除词条
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> 更新
+            </button>
+        </div>
+    </form>
+
+    <div class="footer-info">
+        <i class="fas fa-arrow-right"></i> 
+        对象字段显示两个输入：<strong>text</strong> 和 <strong>book</strong>。
+        <span class="badge-list"><i class="far fa-keyboard"></i> 逗号分隔列表</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // --------------------------------------------------------------
+        // SAMPLE word_data (matching the description)
+        // --------------------------------------------------------------
+
+        // ----- helper: detect value type -----
+        function getValueType(val) {
+            if (val === null || val === undefined) return 'text';
+            if (Array.isArray(val)) return 'list';
+            if (typeof val === 'object' && !Array.isArray(val)) {
+                if ('text' in val && 'book' in val) return 'object';
+                return 'text';
+            }
+            return 'text';
+        }
+
+        // ----- normalize value -----
+        function normalizeValue(val) {
+            const type = getValueType(val);
+            if (type === 'list') {
+                return { type: 'list', value: val.join(', ') };
+            } else if (type === 'object') {
+                return { 
+                    type: 'object', 
+                    text: val.text || '', 
+                    book: val.book || '' 
+                };
+            } else {
+                return { type: 'text', value: String(val ?? '') };
+            }
+        }
+
+        // ----- build field group HTML (key editable as input) -----
+        function buildFieldHTML(key, normalized, index) {
+            const type = normalized.type;
+            const escKey = key.replace(/"/g, '&quot;');
+            const fieldId = `field-${index}`;
+
+            let valueHtml = '';
+            if (type === 'text') {
+                valueHtml = `
+                    <div class="input-wrapper">
+                        <label><i class="far fa-file-alt"></i> value</label>
+                        <input type="text" class="no-outline-input" 
+                               name="field_${index}_value" 
+                               value="${String(normalized.value).replace(/"/g, '&quot;')}"
+                               placeholder="text value">
+                    </div>
+                `;
+            } else if (type === 'list') {
+                valueHtml = `
+                    <div class="input-wrapper">
+                        <label><i class="fas fa-list-ul"></i> list (comma separated)</label>
+                        <input type="text" class="no-outline-input" 
+                               name="field_${index}_value" 
+                               value="${String(normalized.value).replace(/"/g, '&quot;')}"
+                               placeholder="item1, item2, ...">
+                        <div class="object-hint"><i class="fas fa-info-circle"></i> comma separated</div>
+                    </div>
+                `;
+            } else if (type === 'object') {
+                valueHtml = `
+                    <div class="input-wrapper">
+                        <label><i class="fas fa-book-open"></i> text</label>
+                        <input type="text" class="no-outline-input" 
+                               name="field_${index}_obj_text" 
+                               value="${String(normalized.text).replace(/"/g, '&quot;')}"
+                               placeholder="text value">
+                    </div>
+                    <div class="input-wrapper">
+                        <label><i class="fas fa-bookmark"></i> book</label>
+                        <input type="text" class="no-outline-input" 
+                               name="field_${index}_obj_book" 
+                               value="${String(normalized.book).replace(/"/g, '&quot;')}"
+                               placeholder="book title">
+                    </div>
+                `;
+            }
+
+            // key is now an editable input (no outline style)
+            // we use a hidden field to store the type (still needed for collection)
+            // but we remove hidden key fields – we read key from the input.
+            return `
+                <div class="field-group" data-index="${index}" data-key="${escKey}">
+                    <div class="field-header">
+                        <div class="key-editor">
+                            <i class="fas fa-tag"></i>
+                            <input type="text" class="key-input" 
+                                   name="field_${index}_key" 
+                                   value="${escKey}" 
+                                   placeholder="key name" 
+                                   spellcheck="false">
+                        </div>
+                        <button type="button" class="remove-btn remove-field" title="Remove field">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                    <div class="input-row">
+                        ${valueHtml}
+                    </div>
+                    <input type="hidden" name="field_${index}_type" value="${type}">
+                </div>
+            `;
+        }
+
+        // ----- render fields from data object -----
+        function renderFields(data) {
+            const container = document.getElementById('fieldsContainer');
+            const keys = Object.keys(data);
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="placeholder-message">
+                    <i class="fas fa-inbox"></i> 没有字段。使用下方按钮添加。
+                </div>`;
+                return;
+            }
+
+            let html = '';
+            keys.forEach((key, idx) => {
+                const raw = data[key];
+                const normalized = normalizeValue(raw);
+                html += buildFieldHTML(key, normalized, idx);
+            });
+            container.innerHTML = html;
+        }
+
+        // ----- collect form data: read keys from inputs, values from fields, no hidden key fields -----
+        function collectFormData() {
+            const main_fields = {
+                word: document.getElementById('wordInput').value.trim(),
+                pinyin: document.getElementById('pinyinInput').value.trim(),
+                notes: document.getElementById('notesInput').value.trim()
+            };
+            
+            const container = document.getElementById('fieldsContainer');
+            const groups = container.querySelectorAll('.field-group');
+            const data = {};
+
+            groups.forEach(group => {
+                const index = group.dataset.index;
+                // read key from the key input
+                const keyInput = group.querySelector(`input[name="field_${index}_key"]`);
+                if (!keyInput) return;
+                const key = keyInput.value.trim();
+                if (key === '') return; // skip empty keys
+
+                const typeInput = group.querySelector(`input[name="field_${index}_type"]`);
+                if (!typeInput) return;
+                const type = typeInput.value;
+
+                let value;
+                if (type === 'text') {
+                    const input = group.querySelector(`input[name="field_${index}_value"]`);
+                    value = input ? input.value : '';
+                } else if (type === 'list') {
+                    const input = group.querySelector(`input[name="field_${index}_value"]`);
+                    const raw = input ? input.value : '';
+                    value = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                    if (value.length === 0) value = [''];
+                } else if (type === 'object') {
+                    const textInput = group.querySelector(`input[name="field_${index}_obj_text"]`);
+                    const bookInput = group.querySelector(`input[name="field_${index}_obj_book"]`);
+                    value = {
+                        text: textInput ? textInput.value : '',
+                        book: bookInput ? bookInput.value : ''
+                    };
+                } else {
+                    value = '';
+                }
+                data[key] = value;
+            });
+            return { ...main_fields, data };
+        }
+
+        // ----- add new field (type = text, list, object) -----
+        function addField(type) {
+            const container = document.getElementById('fieldsContainer');
+            const existing = container.querySelectorAll('.field-group');
+            let maxIdx = existing.length;
+            let newKey = `${type}_${maxIdx + 1}`;
+            const usedKeys = new Set();
+            existing.forEach(g => {
+                const inp = g.querySelector(`input[name*="_key"]`);
+                if (inp) usedKeys.add(inp.value);
+            });
+            let counter = maxIdx + 1;
+            while (usedKeys.has(newKey)) {
+                newKey = `${type}_${counter}`;
+                counter++;
+            }
+
+            let normalized;
+            if (type === 'list') normalized = { type: 'list', value: '' };
+            else if (type === 'object') normalized = { type: 'object', text: '', book: '' };
+            else normalized = { type: 'text', value: '' };
+
+            const html = buildFieldHTML(newKey, normalized, maxIdx);
+            const placeholder = container.querySelector('.placeholder-message');
+            if (placeholder && existing.length === 0) {
+                container.innerHTML = html;
+            } else {
+                container.insertAdjacentHTML('beforeend', html);
+            }
+        }
+
+        // ----- reset to sample -----
+        function resetToSample() {
+            // also update static fields if needed
+            document.getElementById('wordInput').value = serverWord.word;
+            document.getElementById('pinyinInput').value = serverWord.pinyin;
+            document.getElementById('notesInput').value = serverWord.notes;
+            document.getElementById('wordTitle').textContent = `${serverWord.word} 编辑`;
+            renderFields(serverWord.data || {});
+        }
+
+        // ----- setup delegation and events -----
+        function setupDelegation() {
+            const container = document.getElementById('fieldsContainer');
+
+            // remove field
+            container.addEventListener('click', function(e) {
+                const target = e.target.closest('.remove-field');
+                if (target) {
+                    const group = target.closest('.field-group');
+                    if (group) {
+                        const siblings = container.querySelectorAll('.field-group');
+                        if (siblings.length <= 1) {
+                            container.innerHTML = `<div class="placeholder-message">
+                                <i class="fas fa-inbox"></i> 没有字段。使用下方按钮添加。
+                            </div>`;
+                        } else {
+                            group.remove();
+                        }
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // add buttons
+            document.getElementById('addValueFieldBtn').addEventListener('click', () => addField('text'));
+            document.getElementById('addListFieldBtn').addEventListener('click', () => addField('list'));
+            document.getElementById('addObjectFieldBtn').addEventListener('click', () => addField('object'));
+            document.getElementById('resetToSampleBtn').addEventListener('click', resetToSample);
+
+            // form submit
+            document.getElementById('dynamicForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const data = collectFormData();
+                fetch(`/edit-word?word=${encodeURIComponent(serverWord.word)}&type=${encodeURIComponent(serverWord.type)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                }).then(result => {
+                    flashMessage('词汇已更新!', 'info');
+                }).catch(err => {
+                    console.error('更新词汇时出错:', err);
+                    flashMessage('更新词汇时出错: ' + (err.error || '未知错误'), 'error');
+                })
+            });
+        }
+        function flashMessage(msg, type='info') {
+            const container = document.getElementById('fieldsContainer');
+            const flashDiv = document.createElement('div');
+            flashDiv.textContent = msg;
+            flashDiv.style.padding = '0.8rem 1rem';
+            flashDiv.style.marginBottom = '1rem';
+            flashDiv.style.borderRadius = '12px';
+            flashDiv.style.color = type === 'error' ? '#a14242' : '#1f3b57';
+            flashDiv.style.backgroundColor = type === 'error' ? '#fdeaea' : '#eef3f9';
+            container.prepend(flashDiv);
+            setTimeout(() => {
+                flashDiv.remove();
+            }, 4000);
+        }
+        // ----- render static fields (word, pinyin, notes) -----
+        function renderStaticFields(wordData) {
+            document.getElementById('wordInput').value = wordData.word || '';
+            document.getElementById('pinyinInput').value = wordData.pinyin || '';
+            document.getElementById('notesInput').value = wordData.notes || '';
+            document.getElementById('wordTitle').textContent = (wordData.word || '编辑') + ' 编辑';
+        }
+        function startAILoading() {
+            const generateBtn = document.getElementById('generateWithAIButton');
+            generateBtn.disabled = true;
+            const originalText = generateBtn.innerHTML;
+            generateBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 生成中...`;
+        }
+        function stopAILoading() {
+            const generateBtn = document.getElementById('generateWithAIButton');
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `<i class="fas fa-robot"></i> 使用AI生成`;
+        }
+        function generateWithAI() {
+            startAILoading();
+            fetch(`/generate-word-data-with-ai?word=${encodeURIComponent(serverWord.word)}&type=${encodeURIComponent(serverWord.type)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentData: collectFormData()['data'] })
+            }).then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            }).then(result => {
+                if (result.data) {
+                    renderFields(result.data);
+                    stopAILoading();
+                    flashMessage('AI生成的字段已更新!', 'info');
+                } else {
+                    stopAILoading();
+                    flashMessage('AI生成失败: 未返回数据', 'error');
+                }
+            }).catch(err => {
+                stopAILoading();
+                console.error('AI生成时出错:', err);
+                flashMessage('AI生成时出错: ' + (err.error || '未知错误'), 'error');
+            });
+        }
+
+        document.querySelector('#generateWithAIButton').addEventListener('click', generateWithAI);
+
+        function deleteWord() {
+            if (!confirm('确定要删除这个词条吗？此操作无法撤销。')) return;
+            fetch(`/delete-word?word=${encodeURIComponent(serverWord.word)}&type=${encodeURIComponent(serverWord.type)}`, {
+                method: 'POST'
+            }).then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            }).then(result => {
+                alert('词条已删除');
+                window.location.href = '/';
+            }).catch(err => {
+                console.error('删除词条时出错:', err);
+                alert('删除词条时出错: ' + (err.error || '未知错误'));
+            });
+        }
+        document.querySelector('#deleteWordButton').addEventListener('click', deleteWord);
+
+        const serverWord = {{ word | tojson }}; 
+        
+        renderStaticFields(serverWord);
+        renderFields(serverWord.data || {});
+        setupDelegation();
+    })();
+</script>
+</body>
+</html>

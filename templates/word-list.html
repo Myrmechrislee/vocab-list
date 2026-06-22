@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>中文词汇宝典 · 趣味学汉语</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #fef9e6 0%, #fff3e0 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 标题区 */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #c93a3a, #f4b942);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .hero p {
+            color: #a55d35;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            background: #fff0dd;
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            backdrop-filter: blur(2px);
+        }
+
+        /* 选项卡区域 — 词类标签 */
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .cat-btn {
+            background: #fff4e8;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 60px;
+            color: #b45f2b;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+            backdrop-filter: blur(2px);
+            letter-spacing: 2px;
+        }
+
+        .cat-btn i {
+            font-style: normal;
+            margin-right: 6px;
+        }
+
+        .cat-btn.active {
+            background: #e67e22;
+            color: white;
+            box-shadow: 0 8px 18px rgba(230, 126, 34, 0.3);
+            transform: scale(1.02);
+        }
+
+        .cat-btn:hover:not(.active) {
+            background: #ffdbb5;
+            transform: translateY(-2px);
+        }
+
+        /* 词条网格 */
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .word-card {
+            background: rgba(255, 250, 240, 0.9);
+            backdrop-filter: blur(2px);
+            border-radius: 32px;
+            padding: 1.2rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 215, 170, 0.6);
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: #ffffff;
+            box-shadow: 0 20px 28px rgba(210, 110, 30, 0.2);
+            border-color: #f7bc6c;
+        }
+
+        .chinese-word {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #c0392b;
+            letter-spacing: 2px;
+        }
+
+        /* 模态框 (modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: #fffef7;
+            max-width: 550px;
+            width: 90%;
+            border-radius: 48px;
+            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+            border: 1px solid #ffddb0;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: #ffb347;
+            background: linear-gradient(95deg, #f39c12, #e67e22);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            word-break: break-word;
+        }
+
+        .close-modal {
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.1s;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            background: rgba(0, 0, 0, 0.4);
+            transform: scale(1.05);
+        }
+
+        .modal-body {
+            padding: 1.6rem 1.8rem;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        .info-row {
+            margin-bottom: 1rem;
+            border-left: 4px solid #f5bc70;
+            padding-left: 12px;
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: #b64926;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-content {
+            color: #2c3e2f;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .pinyin-badge {
+            background: #faecd8;
+            padding: 6px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .opposite-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .opposite-tag {
+            background: #ffefe2;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            color: #b64926;
+        }
+
+        .quote-block {
+            background: #fff3e6;
+            padding: 12px;
+            border-radius: 20px;
+            font-style: italic;
+        }
+
+        hr {
+            margin: 12px 0;
+            border-color: #ffe1bf;
+        }
+
+        /* 空状态 */
+        .empty-msg {
+            text-align: center;
+            padding: 3rem;
+            background: #fff2e2;
+            border-radius: 60px;
+            color: #c47e44;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.75rem;
+            color: #cea776;
+        }
+
+        @media (max-width: 550px) {
+            .word-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .chinese-word {
+                font-size: 1.3rem;
+            }
+            .hero h1 {
+                font-size: 1.9rem;
+            }
+        }
+        .games-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .game-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #fff4e8;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #b45f2b;
+            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .game-card:hover {
+            transform: translateY(-2px);
+        }
+        .import-characters {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+        .import-characters button {
+            background: #ff6f61;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
+            transition: all 0.2s ease;
+        }
+        .import-characters button:hover {
+            background: #ff3b2e;
+            transform: translateY(-2px);
+        }
+        .flash-message-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1200;
+        }
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+            animation: fadeOut 3s forwards;
+        }
+        .success-message {
+            background: #27ae60;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+            animation: fadeOut 3s forwards;
+        }
+        .info-row {
+            margin-bottom: 1rem;
+            border-left: 4px solid #f5bc70;
+            padding-left: 12px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .info-table th {
+            background: #f5bc70;
+            color: #2c3e2f;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #ffddb0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .info-table td {
+            padding: 6px 8px;
+            border: 1px solid #ffddb0;
+            vertical-align: middle;
+        }
+
+        .info-table tr:nth-child(even) {
+            background: #fffbf5;
+        }
+        .info-table tr:hover {
+            background: #fff3e6;
+        }
+
+        .info-table input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid #e6d4b8;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            background: transparent;
+        }
+        .info-table input:focus {
+            outline: none;
+            border-color: #f5bc70;
+            box-shadow: 0 0 4px rgba(245, 188, 112, 0.3);
+            background: white;
+        }
+        .info-table .section-header td {
+            background: #f5bc70;
+            font-weight: bold;
+            text-align: center;
+            padding: 8px;
+        }
+        .info-col {
+            width: 25%;
+            padding: 6px;
+        }
+        #importListExtractedModal .modal-container {
+            max-width: 90%;
+            width: 90%;
+            max-height: 90vh;
+        }
+
+        #importListExtractedModal .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        /* Make inputs smaller on mobile */
+        @media (max-width: 768px) {
+            .info-table {
+                font-size: 0.8rem;
+            }
+            .info-table input {
+                font-size: 0.8rem;
+                padding: 2px 4px;
+                min-width: 60px;
+            }
+            .info-table th,
+            .info-table td {
+                padding: 4px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="import-characters">
+        <button id="importBtn" onclick="openImportModal()">📥 倒入词汇表</button>
+    </div>
+    <div class="hero">
+        <h1>📖 中文·万象集</h1>
+        <p>✨ 点击任意词卡 · 领略汉语之美 ✨</p>
+    </div>
+
+    <!-- 动态分类按钮 -->
+    <div class="category-tabs" id="categoryTabs"></div>
+    <div id="gamesContainer"></div>
+
+    <!-- 词汇网格容器 -->
+    <div id="wordsGridContainer" class="word-grid"></div>
+    <footer>🌾 成语 · 词语 · 单字 · 歇后语 · 网络用语</footer>
+</div>
+
+<!-- 模态框结构 -->
+<div id="wordModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2 id="modalWordHead">—</h2>
+            <button class="close-modal" id="closeModalBtn">✕</button>
+        </div>
+        <div class="modal-body" id="modalBodyContent">
+            <!-- 动态填充内容 -->
+            <div style="text-align:center;">加载中...</div>
+        </div>
+    </div>
+</div>
+<div id="importModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2>导入词汇表</h2>
+            <button class="close-modal" id="closeImportModalBtn" onclick="closeImportModal()">✕</button>
+        </div>
+        <div class="modal-body" id="importModalBody">
+            <p>请输入符合格式的 TEXT 词汇数据：</p>
+            <textarea id="importTextarea" style="width:100%;height:200px;border:1px solid #ffddb0;border-radius:12px;padding:12px;font-family: monospace;"></textarea>
+            <button id="confirmImportBtn" style="margin-top:12px;background:#27ae60;color:white;padding:10px 16px;border:none;border-radius:20px;cursor:pointer;font-weight:600;" onclick="sendImportData()">确认导入</button>
+        </div>
+    </div>
+</div>
+<div id="importListExtractedModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2>导入列表确认</h2>
+            <button class="close-modal" id="closeImportListModalBtn" onclick="closeImportListExtractedModal()">✕</button>
+        </div>
+        <div class="modal-body" id="importListModalBody">
+            <p>这里将显示从导入文本中提取的词汇列表，供用户确认后再进行最终导入。</p>
+        </div>
+    </div>
+
+</div>
+<div class="flash-message-container">
+    <span id="flashMessage"></span>
+</div>
+<script>
+    // --------------------------------------------------------------
+    // 扩充的词汇数据集 (涵盖 成语 / 词语 / 字 / 歇后语 / 网络用语)
+    // 包含丰富的 api json 风格字段，完全符合示例数据结构并增强趣味
+    // --------------------------------------------------------------
+
+    // 定义分类顺序 & 展示名称
+    const CATEGORIES = {{ categories | safe }};
+
+    let currentCategory = 'idiom';   // 默认显示成语
+
+    // 获取分类对应词汇
+    function getWordsByType(type) {
+        return fetch(`/api/words?type=${encodeURIComponent(type)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => data.words)
+            .catch(error => {
+                console.error('Error fetching words:', error);
+                return [];
+            });
+    }
+
+    // 渲染分类按钮 (动态tab)
+    function renderTabs() {
+        const tabsContainer = document.getElementById('categoryTabs');
+        if (!tabsContainer) return;
+        tabsContainer.innerHTML = '';
+        CATEGORIES.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = `cat-btn ${currentCategory === cat.id ? 'active' : ''}`;
+            btn.innerHTML = `<i>${cat.icon}</i> ${cat.label}`;
+            btn.addEventListener('click', () => {
+                if (currentCategory === cat.id) return;
+                currentCategory = cat.id;
+                renderTabs();          // 刷新激活样式
+                renderGames();         // 刷新相关游戏展示
+                renderWordGrid();       // 刷新词汇网格
+            });
+            tabsContainer.appendChild(btn);
+        });
+    }
+    function renderGames() {
+        const container = document.getElementById('gamesContainer');
+        if (!container) return;
+
+        const category = CATEGORIES.find(c => c.id === currentCategory);
+
+        if (!category?.games?.length) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="games-grid">
+                ${category.games.map(game => `
+                    <a
+                        class="game-card"
+                        href="${game.url}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span class="game-icon">${game.icon}</span>
+                        <span class="game-label">${game.label}</span>
+                    </a>
+                `).join('')}
+            </div>
+        `;
+    }
+    function flashMessage(text, type = 'success') {
+        const flashContainer = document.getElementById('flashMessage');
+        if (!flashContainer) return;
+        flashContainer.innerText = text;
+        flashContainer.className = type === 'error' ? 'error-message' : 'success-message';
+        setTimeout(() => {
+            flashContainer.innerText = '';
+            flashContainer.className = '';
+        }, 3000);
+    }
+    function sendImportData() {
+        const textarea = document.getElementById('importTextarea');
+        if (!textarea) return;
+        const data = textarea.value;
+        fetch('/import-list-raw', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/text'
+            },
+            body: data
+        })
+        .then(response => {
+            if (!response.ok) {
+                flashMessage(`导入请求失败: ${response.statusText}`, 'error');
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.matched_new_words) {
+                openImportListExtractedModal(result.matched_new_words, result.unmatched_new_words, result.existing_words);
+
+            } else {
+                flashMessage(`导入失败: ${result.error || '未知错误'}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error importing data:', error);
+            flashMessage('导入请求失败，请稍后再试。', 'error');
+        });
+    }
+    function openImportModal() {
+        const modal = document.getElementById('importModal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+    }
+    function closeImportModal() {
+        const modal = document.getElementById('importModal');
+        if (modal) {
+            modal.querySelector('#importTextarea').value = '';
+            modal.classList.remove('active');
+        }
+    }
+    function clearSectionRows(headerRowElement) {
+        headerRowElement.nextElementSibling?.remove();
+        let next = headerRowElement.nextElementSibling;
+        while(next && next.querySelector("input[name='words[]']")) {
+            next.remove();
+            next = headerRowElement.nextElementSibling;
+        }
+    }
+    function openImportListExtractedModal(matched_new_words, unmatched_new_words, existing_words) {
+        const modal = document.getElementById('importListExtractedModal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+        const modalBody = modal.querySelector('#importListModalBody')
+        
+        // Create table for all entries
+        const table = document.createElement('table');
+        table.className = 'info-table';
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>词汇 (Word)</th>
+                    <th>注释 (Notes)</th>
+                    <th>拼音 (Pinyin)</th>
+                    <th>类型 (Types)</th>
+                </tr>
+            </thead>
+            <tbody id="importTableBody"></tbody>
+        `;
+        modalBody.appendChild(table);
+        
+        const tbody = table.querySelector('#importTableBody');
+        
+        // Function to add rows to table
+        function addRowsToTable(entries, sectionLabel) {
+            if (entries.length === 0) return;
+            
+            // Add section header row with clear button
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `
+                <td colspan="3" style="background: #f5bc70; font-weight: bold; text-align: center; padding: 8px;">
+                    ${sectionLabel} (${entries.length})
+                </td>
+                <td style="background: #f5bc70; text-align: center; padding: 8px;">
+                    <button style='background:#ff9800;color:white;padding:4px 8px;border:none;border-radius:12px;cursor:pointer;font-size:0.8rem;font-weight:bold;' type='button' onclick='clearSectionRows(this.parentElement.parentElement)'>清空</button>
+                </td>
+            `;
+            tbody.appendChild(headerRow);
+            
+            // Store section marker rows to help with clearing
+            const sectionStart = document.createElement('tr');
+            sectionStart.className = `section-${sectionLabel.replace(/\s+/g, '-')}`;
+            sectionStart.style.display = 'none';
+            tbody.appendChild(sectionStart);
+            
+            entries.forEach(([word, notes, pinyin, types]) => {
+                const matchesAsString = types.join(', ');
+                const row = document.createElement('tr');
+                row.className = `section-${sectionLabel.replace(/\s+/g, '-')}`;
+                row.innerHTML = `
+                    <td><input type='text' value='${escapeHtml(word)}' name='words[]'/></td>
+                    <td><input type='text' value='${escapeHtml(notes)}' name='notes[]'/></td>
+                    <td><input type='text' value='${escapeHtml(pinyin)}' name='pinyins[]'/></td>
+                    <td><input type='text' value='${escapeHtml(matchesAsString)}' name='types[]'/></td>
+                    <td><button type='button' onclick='this.parentElement.parentElement.remove()' style='background:#e74c3c;color:white;padding:4px 8px;border:none;border-radius:12px;cursor:pointer;font-size:0.8rem;'>删除</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Add each category
+        addRowsToTable(unmatched_new_words, '未定义词汇 (Unmatched)');
+        addRowsToTable(matched_new_words, '发现定义词汇 (Matched)');
+        addRowsToTable(existing_words, '已存在词汇 (Existing)');
+        
+        // Add confirm button
+        const confirmBtn = document.createElement('button');
+        confirmBtn.style = 'margin-top:12px;background:#27ae60;color:white;padding:10px 16px;border:none;border-radius:20px;cursor:pointer;font-weight:600;';
+        confirmBtn.innerText = '确认导入';
+        modalBody.appendChild(confirmBtn);
+        
+        confirmBtn.addEventListener('click', () => {
+            if (validateImportListExtracted()) {
+                const matchList = Array.from(document.querySelectorAll("input[name='words[]']")).map((input, index) => {
+                    const word = input.value.trim();
+                    const notes = document.querySelectorAll("input[name='notes[]']")[index].value.trim();
+                    const pinyin = document.querySelectorAll("input[name='pinyins[]']")[index].value.trim();
+                    const types = document.querySelectorAll("input[name='types[]']")[index].value.trim().split(',').map(t => t.trim());
+                    return [word, notes, pinyin, types];
+                });
+                fetch('/import-list-confirmed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        entries: matchList.map(([word, notes, pinyin, types]) => ({
+                            word,
+                            notes,
+                            pinyin,
+                            types
+                        }))
+                    })
+                }).then(response => {
+                    if (!response.ok) {
+                        flashMessage(`导入失败: ${response.statusText}`, 'error');
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                }).then(result => {
+                    if (result.status === 'success') {
+                        flashMessage(`词汇表导入词汇！（${result.added_count}个）`, 'success');
+                        closeImportListExtractedModal();
+                        closeImportModal();
+                        // 可选：刷新页面或更新词汇列表显示
+                    } else {
+                        flashMessage(`导入失败: ${result.error || '未知错误'}`, 'error');
+                    }
+                })
+            }
+        });
+    }
+    function validateImportListExtracted() {
+        const wordInputs = document.querySelectorAll("input[name='words[]']");
+        const noteInputs = document.querySelectorAll("input[name='notes[]']");
+        const typeInputs = document.querySelectorAll("input[name='types[]']");
+        const pinyinInputs = document.querySelectorAll("input[name='pinyins[]']");
+
+        const words = Array.from(wordInputs).map(input => input.value.trim());
+        const notes = Array.from(noteInputs).map(input => input.value.trim());
+        const types = Array.from(typeInputs).map(input => input.value.trim());
+        const pinyins = Array.from(pinyinInputs).map(input => input.value.trim());
+        
+        valid = true;
+        // No empty words or types allowed
+        for (let i = 0; i < words.length; i++) {
+            if (!words[i]) {
+                valid = false;
+                wordInputs[i].style.borderColor = '#e74c3c';
+            }
+        }
+        if (!valid) {
+            flashMessage('请填写所有词汇', 'error');
+            return false;
+        }
+        
+        for (let i = 0; i < types.length; i++) {
+            if (!types[i]) {
+                valid = false;
+                typeInputs[i].style.borderColor = '#e74c3c';
+            }
+        }
+        if (!valid) {
+            flashMessage('请填写所有类型', 'error');
+            return false;
+        }
+        for (let i = 0; i < pinyins.length; i++) {
+            if (!pinyins[i]) {
+                valid = false;
+                pinyinInputs[i].style.borderColor = '#e74c3c';
+            }
+        }
+        if (!valid) {
+            flashMessage('请填写所有拼音', 'error');
+            return false;
+        }
+        return true;
+    }
+    function closeImportListExtractedModal() {
+    const modal = document.getElementById('importListExtractedModal');
+    if (modal) {
+        const modalBody = modal.querySelector('#importListModalBody')
+        modalBody.innerHTML = `<p>这里将显示从导入文本中提取的词汇列表，供用户确认后再进行最终导入。</p>`;
+        modal.classList.remove('active');
+    }
+}
+    function getWordData(word, type) {
+        return fetch(`/api/word-data?word=${encodeURIComponent(word)}&type=${encodeURIComponent(type)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => data['data'])
+            .catch(error => {
+                console.error('Error fetching word data:', error);
+                return null;
+            });
+    }
+    // 获取展示详细信息 (基于词条对象构建模态内容)
+    async function buildModalContent(item) {
+        // 构建反义词区域
+        const data = await getWordData(item.word, item.type);
+        let html = ``;
+        const icons = {
+            'pinyin': '🔊',
+            'explanation': '✨',
+            'opposite': '🔄',
+            'usage': '📖',
+            'word': '🀄',
+        };
+        // Sort so, word, pinyin, explanation, comes first
+        const orderedDict = Object.keys(data)
+        .sort((a, b) => {
+            const order = ['word', 'pinyin', 'explanation', 'opposite', 'usage'];
+            const indexA = order.indexOf(a);
+            const indexB = order.indexOf(b);
+            if (indexA === -1 && indexB === -1) return 0;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+        })
+        .reduce((obj, key) => {
+            obj[key] = data[key];
+            return obj;
+        }, {});
+
+        for (const [key, value] of Object.entries(orderedDict)) {
+            if (typeof value === 'string' && value.trim() !== '') {
+                html += `<div class="info-row">
+                    <div class="info-label">${icons[key] || '🔍'} ${escapeHtml(key)}</div>
+                    <div class="info-content">${escapeHtml(value)}</div>
+                </div>`;
+            } else if (item.type == 'char' && key == 'pronunciations') {
+                html += `<div class="info-row">
+                    <div class="info-label">🔊 Pronounciations</div><div class="info-content">`
+                for (const pronounciation of value) {
+                    html += `<p class="pinyin-badge">${escapeHtml(pronounciation['pinyin'])}</p><ol style="margin-left: 12px;color:#2c3e2f;font-size:0.95rem;">`;
+                        for (const explanation of pronounciation['explanations']) {
+                            html += `<li style="margin-left: 12px;color:#2c3e2f;font-size:0.95rem;">${escapeHtml(explanation['content'])}</li>`;
+                        }
+                        html += `</ol>`;
+                }
+                html += `</div></div>`;
+            } else if (Array.isArray(value)) {
+                html += `<div class="info-row">
+                    <div class="info-label">${icons[key] || '🔍'} ${escapeHtml(key)}</div>
+                    <div class="info-content">${escapeHtml(value.join(', '))}</div>
+                </div>`;
+            }
+        }
+
+        const smallMessageSection = document.createElement('div');
+        const smallMessage = document.createElement('p');
+        smallMessage.style.fontSize = '0.75rem';
+        smallMessage.style.color = '#a55d35';
+        smallMessage.style.marginTop = '12px';
+        smallMessage.innerHTML = `若想要修改或添加词条，请按<a href="/edit-word?word=${encodeURIComponent(item.word)}&type=${encodeURIComponent(item.type)}">此链接</a>`;
+        smallMessageSection.appendChild(smallMessage);
+        
+        html += smallMessageSection.outerHTML;
+
+        return html;
+    }
+
+    // 简易防XSS
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // 展示模态框
+    let currentModalItem = null;
+    const modalOverlay = document.getElementById('wordModal');
+    const modalWordHead = document.getElementById('modalWordHead');
+    const modalBodyContent = document.getElementById('modalBodyContent');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    async function openModal(wordItem) {
+        if (!modalOverlay || !modalWordHead || !modalBodyContent) return;
+        modalWordHead.innerText = wordItem.word;
+        const contentHtml = await buildModalContent(wordItem);
+        modalBodyContent.innerHTML = contentHtml;
+        modalOverlay.classList.add('active');
+        currentModalItem = wordItem;
+    }
+
+    function closeModal() {
+        if (modalOverlay) modalOverlay.classList.remove('active');
+        currentModalItem = null;
+    }
+
+    // 渲染词汇网格 (根据当前分类)
+    async function renderWordGrid() {
+        const container = document.getElementById('wordsGridContainer');
+        if (!container) return;
+        const wordsList = await getWordsByType(currentCategory);
+        if (wordsList.length === 0) {
+            container.innerHTML = `<div class="empty-msg">✨ 暂无此类词汇，后续添加更多有趣词条 ✨</div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        wordsList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'word-card';
+            card.innerHTML = `
+                <div class="chinese-word">${escapeHtml(item.word)}</div>
+            `;
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(item);
+            });
+            container.appendChild(card);
+        });
+    }
+
+    // 全局关闭模态: 点击遮罩或按ESC
+    function setupModalEvents() {
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
+        });
+    }
+
+    // 初始化整个应用
+    function init() {
+        renderTabs();
+        renderGames();
+        renderWordGrid();
+        setupModalEvents();
+    }
+
+    init();
+</script>
+</body>
+</html>
