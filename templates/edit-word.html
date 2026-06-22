@@ -602,6 +602,7 @@
 
             // form submit
             document.getElementById('dynamicForm').addEventListener('submit', function(e) {
+                startSaveAnimation();
                 e.preventDefault();
                 const data = collectFormData();
                 fetch(`/edit-word?word=${encodeURIComponent(serverWord.word)}&type=${encodeURIComponent(serverWord.type)}`, {
@@ -614,8 +615,10 @@
                     }
                     return response.json();
                 }).then(result => {
-                    flashMessage('词汇已更新!', 'info');
+                    stopSaveAnimation();
+                    flashMessage('词汇已更新!', 'success');
                 }).catch(err => {
+                    stopSaveAnimation();
                     console.error('更新词汇时出错:', err);
                     flashMessage('更新词汇时出错: ' + (err.error || '未知错误'), 'error');
                 })
@@ -626,10 +629,30 @@
             const flashDiv = document.createElement('div');
             flashDiv.textContent = msg;
             flashDiv.style.padding = '0.8rem 1rem';
-            flashDiv.style.marginBottom = '1rem';
             flashDiv.style.borderRadius = '12px';
-            flashDiv.style.color = type === 'error' ? '#a14242' : '#1f3b57';
-            flashDiv.style.backgroundColor = type === 'error' ? '#fdeaea' : '#eef3f9';
+            // Colors for: info, error and success
+            switch(type) {
+                case 'info':
+                    flashDiv.style.color = '#1f3b57';
+                    flashDiv.style.backgroundColor = '#eef3f9';
+                    break;
+                case 'error':
+                    flashDiv.style.color = '#a14242';
+                    flashDiv.style.backgroundColor = '#fdeaea';
+                    break;
+                case 'success':
+                    flashDiv.style.color = '#1f3b57';
+                    flashDiv.style.backgroundColor = '#e6f4ea';
+                    break;
+                default:
+                    flashDiv.style.color = '#1f3b57';
+                    flashDiv.style.backgroundColor = '#eef3f9';
+            }
+
+            flashDiv.style.position = 'fixed';
+            flashDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.05)';
+            flashDiv.style.top  = '1rem';
+            flashDiv.style.right = '1rem';
             container.prepend(flashDiv);
             setTimeout(() => {
                 flashDiv.remove();
@@ -653,6 +676,17 @@
             generateBtn.disabled = false;
             generateBtn.innerHTML = `<i class="fas fa-robot"></i> 使用AI生成`;
         }
+        function startSaveAnimation() {
+            const saveBtn = document.querySelector('#dynamicForm button[type="submit"]');
+            saveBtn.disabled = true;
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 保存中...`;
+        }
+        function stopSaveAnimation() {
+            const saveBtn = document.querySelector('#dynamicForm button[type="submit"]');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fas fa-check"></i> 更新`;
+        }
         function generateWithAI() {
             startAILoading();
             fetch(`/generate-word-data-with-ai?word=${encodeURIComponent(serverWord.word)}&type=${encodeURIComponent(serverWord.type)}`, {
@@ -668,7 +702,7 @@
                 if (result.data) {
                     renderFields(result.data);
                     stopAILoading();
-                    flashMessage('AI生成的字段已更新!', 'info');
+                    flashMessage('AI生成的字段已更新!', 'success');
                 } else {
                     stopAILoading();
                     flashMessage('AI生成失败: 未返回数据', 'error');
