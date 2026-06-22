@@ -991,9 +991,11 @@
         container.innerHTML = '';
         wordsList.forEach(item => {
             const card = document.createElement('div');
+            const category = CATEGORIES.find(c => c.id === item.type);
             card.className = 'word-card';
             card.innerHTML = `
                 <div class="chinese-word">${escapeHtml(item.word)}</div>
+                <span style="font-size:0.9rem;color:#7f8c8d;margin-top:6px;">${escapeHtml(category ? category.label : item.type)}</span>
             `;
             card.addEventListener('click', (e) => {
                 e.stopPropagation();
