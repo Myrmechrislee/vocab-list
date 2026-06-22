@@ -40,6 +40,21 @@ def get_words_for_type(word_type):
         collection = db['vocabList']
         return list(collection.find({'type': word_type}, {'_id': 0}))
 
+def query_words(word_type, query):
+    with connect() as db:
+        collection = db['vocabList']
+        if word_type != 'all':
+            query = {
+                "$and": [
+                    {'type': word_type},
+                    {'word': {'$regex': f'{query}', '$options': 'i'}}
+                ]
+            }
+        else:
+            query = {
+                'word': {'$regex': f'{query}', '$options': 'i'}
+            }
+        return list(collection.find(query, {'_id': 0}))
 def get_duplicate_words(matchlist):
     with connect() as db:
         query = {

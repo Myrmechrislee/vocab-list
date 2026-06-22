@@ -434,6 +434,33 @@
             padding: 1rem;
         }
 
+        .search-bar-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 2px solid #ffddb0;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: #ff9800;
+        }
+
+        .search-bar::placeholder {
+            color: #999;
+        }
+
         /* Make inputs smaller on mobile */
         @media (max-width: 768px) {
             .info-table {
@@ -448,6 +475,10 @@
             .info-table td {
                 padding: 4px 4px;
             }
+            .search-bar {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
         }
     </style>
 </head>
@@ -456,6 +487,9 @@
 <div class="app-container">
     <div class="import-characters">
         <button id="importBtn" onclick="openImportModal()">📥 倒入词汇表</button>
+    </div>
+    <div class="search-bar-container">
+        <input class="search-bar" type="text" placeholder="搜索词汇..." id="searchBar" oninput="renderWordGrid()">
     </div>
     <div class="hero">
         <h1>📖 中文·万象集</h1>
@@ -524,8 +558,8 @@
     let currentCategory = 'idiom';   // 默认显示成语
 
     // 获取分类对应词汇
-    function getWordsByType(type) {
-        return fetch(`/api/words?type=${encodeURIComponent(type)}`)
+    function fetchWords(query, type) {
+        return fetch(`/api/words?type=${encodeURIComponent(type)}&query=${encodeURIComponent(query)}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -544,6 +578,20 @@
         const tabsContainer = document.getElementById('categoryTabs');
         if (!tabsContainer) return;
         tabsContainer.innerHTML = '';
+
+        // Add "All Categories" tab
+        const allBtn = document.createElement('button');
+        allBtn.className = `cat-btn ${currentCategory === 'all' ? 'active' : ''}`;
+        allBtn.innerHTML = `<i>📚</i> All Categories`;
+        allBtn.addEventListener('click', () => {
+            if (currentCategory === 'all') return;
+            currentCategory = 'all';
+            renderTabs();          // 刷新激活样式
+            renderGames();         // 刷新相关游戏展示
+            renderWordGrid();       // 刷新词汇网格
+        });
+        tabsContainer.appendChild(allBtn);
+        
         CATEGORIES.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = `cat-btn ${currentCategory === cat.id ? 'active' : ''}`;
@@ -932,8 +980,9 @@
     // 渲染词汇网格 (根据当前分类)
     async function renderWordGrid() {
         const container = document.getElementById('wordsGridContainer');
+        const searchQuery = document.getElementById('searchBar').value.trim().toLowerCase();
         if (!container) return;
-        const wordsList = await getWordsByType(currentCategory);
+        const wordsList = await fetchWords(searchQuery, currentCategory);
         if (wordsList.length === 0) {
             container.innerHTML = `<div class="empty-msg">✨ 暂无此类词汇，后续添加更多有趣词条 ✨</div>`;
             return;

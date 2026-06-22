@@ -83,9 +83,10 @@ def import_word_list_confirmed():
 @app.route('/api/words')
 def api_words():
     word_type = request.args.get('type')
+    query = request.args.get('query', '').strip()
     if not word_type:
         return jsonify({"error": "Missing 'type' parameter"}), 400
-    words = db.get_words_for_type(word_type)
+    words = db.query_words(word_type, query)
     return jsonify({"words": words})
 
 @app.route('/api/word-data')
